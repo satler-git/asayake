@@ -1,0 +1,52 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        target:
+        - x86_64-unknown-linux-gnu
+        - x86_64-unknown-linux-musl
+        - x86_64-pc-windows-msvc
+        include:
+        - target: x86_64-unknown-linux-gnu
+          os: ubuntu-latest
+        - target: x86_64-unknown-linux-musl
+          os: ubuntu-latest
+        - target: x86_64-pc-windows-msvc
+          os: windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Rust toolchain
+      run: |
+        rustup target add ${{ matrix.target }}
+    - uses: Swatinem/rust-cache@v2
+      with:
+        prefix-key: "v0-rust-${{ matrix.target }}"
+    - name: Build
+      run: cargo build --verbose --release
+#    - name: Upload artifacts(Windows)
+#      uses: actions/upload-artifact@v4
+#      if: matrix.os == 'windows-latest'
+#      with:
+#        name: nighty-${{ github.sha }}-${{ matrix.target }}
+#        path: ./target/release/
+#    - name: Upload artifacts(not Windows)
+#      uses: actions/upload-artifact@v4
+#      if: matrix.os != 'windows-latest'
+#      with:
+#        name: nighty-${{ github.sha }}-${{ matrix.target }}
+#        path: ./target/release/
