@@ -1,3 +1,3 @@
-# rust-template
+# asayake
 
-my template for rust-lang
+Yet another status bar for komorebi.

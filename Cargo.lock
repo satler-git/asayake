@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "rust-template"
+name = "asayake"
 version = "0.1.0"
