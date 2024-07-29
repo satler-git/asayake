@@ -1,36 +1,46 @@
-use anyhow::{Ok, Result};
+#![allow(non_snake_case)]
 
-use komorebi_client::{send_query, SocketMessage, State};
-use winput::{message_loop, Action, Vk};
+use dioxus::prelude::*;
+use dioxus_logger::tracing::{info, Level};
 
-// TODO: GUIを作るときにaltはStateで管理(Pressedはイベントとしてずっとだから)
-fn main() -> Result<()> {
-    let receiver = message_loop::start().unwrap();
+#[derive(Clone, Routable, Debug, PartialEq)]
+enum Route {
+    #[route("/")]
+    Home {},
+}
 
-    loop {
-        match receiver.next_event() {
-            message_loop::Event::Keyboard { vk, action, .. } => match action {
-                Action::Press => match vk {
-                    Vk::Escape => {
-                        if cfg!(debug_assertions) {
-                            break;
-                        }
-                    }
-                    Vk::Alt => println!("Alt pressed!"),
-                    _ => {}
-                },
-                Action::Release => match vk {
-                    Vk::Alt => {
-                        println!("Alt released!");
-                        let str_state = &send_query(&SocketMessage::State).unwrap();
-                        let state: State = serde_json::from_str(str_state).unwrap();
-                        println!("And git the State, Here {:?}", state);
-                    }
-                    _ => {}
-                },
+fn main() {
+    // Init logger
+    dioxus_logger::init(Level::INFO).expect("failed to init logger");
+    info!("starting app");
+
+    let cfg = dioxus::desktop::Config::new()
+        .with_custom_head(r#"<link rel="stylesheet" href="tailwind.css">"#.to_string());
+    LaunchBuilder::desktop().with_cfg(cfg).launch(App);
+}
+
+#[component]
+fn App() -> Element {
+    rsx! {
+        Router::<Route> {}
+    }
+}
+
+#[component]
+fn Home() -> Element {
+    let mut count = use_signal(|| 0);
+
+    rsx! {
+        Link {
+            to: Route::Blog {
+                id: count()
             },
-            _ => (),
+            "Go to blog"
+        }
+        div {
+            h1 { "High-Five counter: {count}" }
+            button { onclick: move |_| count += 1, "Up high!" }
+            button { onclick: move |_| count -= 1, "Down low!" }
         }
     }
-    Ok(())
 }
