@@ -7,6 +7,9 @@ use anyhow::{Context as _, Result};
 
 use komorebi_client::{send_query, SocketMessage, State};
 use tauri::Manager as _;
+use tauri::SystemTray;
+use tauri::SystemTrayEvent;
+use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem};
 use winput::{
     message_loop::{self, EventReceiver},
     Action, Vk,
@@ -23,13 +26,32 @@ async fn main() -> Result<()> {
     let loop_break = Arc::new(RwLock::new(false));
 
     let loop_break_rec = Arc::clone(&loop_break);
+    let loop_break_system_tray = Arc::clone(&loop_break);
+
+    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+    let tray_menu = SystemTrayMenu::new().add_item(quit);
+
+    let tray = SystemTray::new().with_menu(tray_menu);
 
     tauri::Builder::default()
+        .system_tray(tray)
+        .on_system_tray_event(move |_app, event| match event { // TODO: 関数へ切り出し。とりあえずeventだけ投げれば良さそう
+            SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+                "quit" => {
+                    *loop_break_system_tray.write().unwrap() = true;
+                    std::process::exit(0);
+                }
+                _ => {}
+            },
+            _ => {}
+        })
         .setup(|app| {
             let main_window = app.get_window("main").unwrap();
 
             tokio::task::spawn(async move {
-                // タスクを記述する
+                // Altキーの監視
+                // TODO: 関数へ切り出し
+                // メモ: asyncブロックはfutureを返す。だからmoveしている変数だけ引数にしてasync関数をつくればいい
                 let receiver = message_loop::start().unwrap();
                 let mut state = alt_state(&receiver, &false).unwrap();
 
@@ -40,7 +62,9 @@ async fn main() -> Result<()> {
                         if state {
                             // Windowを表示して描画。イベントを送る。windowの位置を正しくする。
                             main_window.show().unwrap();
-                            main_window.set_position( tauri::PhysicalPosition {x: 100, y: 100}).unwrap();
+                            main_window
+                                .set_position(tauri::PhysicalPosition { x: 100, y: 100 })
+                                .unwrap();
                         } else {
                             // Windowを隠す
                             main_window.hide().unwrap();
