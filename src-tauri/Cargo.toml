@@ -2,9 +2,8 @@
 name = "app"
 version = "0.1.0"
 description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+authors = ["satler-git <mitsclatw24@mbr.nifty.com>"]
+license = "MIT"
 default-run = "app"
 edition = "2021"
 rust-version = "1.60"
@@ -18,6 +17,12 @@ tauri-build = { version = "1.5.3" }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.7.0" }
+
+anyhow = "1.0.86"
+komorebi-client = { git = "https://github.com/LGUG2Z/komorebi", tag = "v0.1.28" }
+winput = "0.2.5"
+sonic-rs = "0.3.9"
+
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
