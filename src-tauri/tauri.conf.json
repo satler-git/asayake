@@ -56,7 +56,14 @@
       {
         "fullscreen": false,
         "height": 600,
-        "resizable": true,
+        "resizable": false,
+        "closable": false,
+        "focus": false,
+        "alwaysOnTop": true,
+        "contentProtected": true,
+        "skipTaskbar": true,
+        "transparent": true,
+        "decorations": false,
         "title": "asayake",
         "width": 800
       }
