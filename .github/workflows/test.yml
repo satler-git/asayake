@@ -24,9 +24,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup Rust toolchain
+    - name: Setup Rust toolchain and cli
       run: |
         rustup target add ${{ matrix.target }}
+        cargo install tauri-cli
 #       rustup install nightly
 #       rustup +nightly component add miri
     - uses: Swatinem/rust-cache@v2
@@ -34,5 +35,7 @@ jobs:
         prefix-key: "v0-rust-${{ matrix.target }}"
     - name: Test
       run: |
+        cargo test
+        cd src-tauri
         cargo test
 #       cargo +nightly miri test
