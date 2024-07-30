@@ -57,16 +57,17 @@ fn komorebi_state() -> Result<State> {
 
 #[component]
 fn Home() -> Element {
-    let receiver = message_loop::start().unwrap();
-    let alt = alt_state(&receiver).unwrap();
+    let receiver = use_signal(|| message_loop::start().unwrap());
+    let mut alt = use_signal(|| alt_state(&*receiver.read()).unwrap());
 
-    if alt {
-        let state = komorebi_state().unwrap();
+    if *alt.read() {
+        // let state = komorebi_state().unwrap();
     }
     rsx! {
         div {
             h1 { "High-Five counter: 0" }
             h1 { "Alt State: {alt}" }
+            button { onclick: move |_| *alt.write() = alt_state(&*receiver.read()).unwrap() }
         }
     }
 }
