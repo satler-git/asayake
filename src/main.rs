@@ -3,6 +3,14 @@
 use dioxus::prelude::*;
 use dioxus_logger::tracing::{info, Level};
 
+use anyhow::{Context as _, Result};
+
+use komorebi_client::{send_query, SocketMessage, State};
+use winput::{
+    message_loop::{self, EventReceiver},
+    Action, Vk,
+};
+
 #[derive(Clone, Routable, Debug, PartialEq)]
 enum Route {
     #[route("/")]
@@ -26,21 +34,39 @@ fn App() -> Element {
     }
 }
 
+fn alt_state(receiver: &EventReceiver) -> Result<bool> {
+    match receiver.next_event() {
+        message_loop::Event::Keyboard {
+            vk: Vk::Alt,
+            action,
+            ..
+        } => match action {
+            Action::Press => Ok(true),
+            Action::Release => Ok(false),
+        },
+        _ => Ok(false),
+    }
+}
+
+fn komorebi_state() -> Result<State> {
+    sonic_rs::from_str(&send_query(&SocketMessage::State)?).context("Unable to get the state of komorebi now.")
+    // If you get this error.
+    // You may be running a different versionof komorebi (We're using komorebi-client v0.1.28)
+    // or, you may not running komorebi
+}
+
 #[component]
 fn Home() -> Element {
-    let mut count = use_signal(|| 0);
+    let receiver = message_loop::start().unwrap();
+    let alt = alt_state(&receiver).unwrap();
 
+    if alt {
+        let state = komorebi_state().unwrap();
+    }
     rsx! {
-        Link {
-            to: Route::Blog {
-                id: count()
-            },
-            "Go to blog"
-        }
         div {
-            h1 { "High-Five counter: {count}" }
-            button { onclick: move |_| count += 1, "Up high!" }
-            button { onclick: move |_| count -= 1, "Down low!" }
+            h1 { "High-Five counter: 0" }
+            h1 { "Alt State: {alt}" }
         }
     }
 }

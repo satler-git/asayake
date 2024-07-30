@@ -15,6 +15,5 @@ dioxus-logger = "0.5.1"
 
 anyhow = "1.0.86"
 komorebi-client = { git = "https://github.com/LGUG2Z/komorebi", tag = "v0.1.28" }
-serde = "1.0.204"
-serde_json = "1.0.121"
 winput = "0.2.5"
+sonic-rs = "0.3.9"
