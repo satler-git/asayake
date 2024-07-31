@@ -32,7 +32,7 @@ jobs:
       with:
         prefix-key: "v0-rust-${{ matrix.target }}"
     - name: Build
-      run: cargo tauri build --verbose --release
+      run: cargo tauri build --verbose -- --release
     - name: Upload artifacts(Windows)
       uses: actions/upload-artifact@v4
       if: matrix.os == 'windows-latest'
