@@ -10,6 +10,7 @@ use tauri::Manager as _;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
 use tauri::SystemTrayMenu;
+use tauri_plugin_positioner::{WindowExt, Position};
 use winput::{
     message_loop::{self, EventReceiver},
     Action, Vk,
@@ -33,6 +34,7 @@ async fn main() -> Result<()> {
     let tray = SystemTray::new().with_menu(tray_menu);
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_positioner::init())
         .system_tray(tray)
         .on_system_tray_event(move |app, event| match event { // TODO: 関数へ切り出し。とりあえずeventだけ投げれば良さそう
             // SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
@@ -58,16 +60,16 @@ async fn main() -> Result<()> {
                 // メモ: asyncブロックはfutureを返す。だからmoveしている変数だけ引数にしてasync関数をつくればいい
                 let receiver = message_loop::start().unwrap();
                 let mut state = alt_state(&receiver, &false).unwrap();
+                main_window.hide().unwrap();
+                main_window
+                    .move_window(Position::TopCenter).unwrap();
 
                 loop {
                     let old_state = state.clone();
                     state = alt_state(&receiver, &old_state).unwrap();
                     if old_state != state {
                         if state {
-                            // Windowを表示して描画。イベントを送る。windowの位置を正しくする。
-                            main_window
-                                .set_position(tauri::PhysicalPosition { x: 100, y: 100 })
-                                .unwrap();
+                            // Windowを表示して描画。イベントを送る。
                             main_window.show().unwrap();
                         } else {
                             // Windowを隠す
