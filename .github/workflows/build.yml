@@ -30,7 +30,7 @@ jobs:
     - uses: Swatinem/rust-cache@v2
       with:
         prefix-key: "v0-rust-${{ matrix.target }}"
-    - uses: cargo-bins/cargo-binstall@c635ad6
+    - uses: cargo-bins/cargo-binstall@c635ad6f957466c7818a18cb88570757ee1002b3
     - name: Install depends via cargo-install
       run: |
             cargo binstall tauri-cli
