@@ -61,10 +61,10 @@ async fn main() -> Result<()> {
                     if old_state != state {
                         if state {
                             // Windowを表示して描画。イベントを送る。windowの位置を正しくする。
-                            main_window.show().unwrap();
                             main_window
                                 .set_position(tauri::PhysicalPosition { x: 100, y: 100 })
                                 .unwrap();
+                            main_window.show().unwrap();
                         } else {
                             // Windowを隠す
                             main_window.hide().unwrap();
