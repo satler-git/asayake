@@ -30,12 +30,13 @@ jobs:
     - uses: Swatinem/rust-cache@v2
       with:
         prefix-key: "v0-rust-${{ matrix.target }}"
+    - uses: cargo-bins/cargo-binstall@c635ad6
     - name: Install depends via cargo-install
       run: |
-            cargo install tauri-cli
-            cargo install --locked trunk
+            cargo binstall tauri-cli
+            cargo binstall trunk
     - name: Build
-      run: cargo tauri build --verbose -- --release
+      run: cargo tauri build --verbose --ci -- --release
     - name: Upload artifacts(Windows)
       uses: actions/upload-artifact@v4
       if: matrix.os == 'windows-latest'
