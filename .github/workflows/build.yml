@@ -33,8 +33,8 @@ jobs:
     - uses: cargo-bins/cargo-binstall@c635ad6f957466c7818a18cb88570757ee1002b3
     - name: Install depends via cargo-install
       run: |
-            cargo binstall tauri-cli
-            cargo binstall trunk
+            cargo binstall tauri-cli --no-confirm
+            cargo binstall trunk --locked --no-confirm
     - name: Build
       run: cargo tauri build --verbose --ci -- --release
     - name: Upload artifacts(Windows)
