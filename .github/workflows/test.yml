@@ -1,4 +1,4 @@
-name: Rust
+name: Rust Test
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
     - name: Setup Rust toolchain and cli
       run: |
         rustup target add ${{ matrix.target }}
-        cargo install tauri-cli
+        rustup target add wasm32-unknown-unknown
 #       rustup install nightly
 #       rustup +nightly component add miri
     - uses: Swatinem/rust-cache@v2

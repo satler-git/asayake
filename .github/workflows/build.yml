@@ -1,4 +1,4 @@
-name: Rust
+name: Rust Build
 
 on:
   push:
@@ -27,12 +27,17 @@ jobs:
     - name: Setup Rust toolchain and cli
       run: |
         rustup target add ${{ matrix.target }}
-        cargo install tauri-cli
+        rustup target add wasm32-unknown-unknown
     - uses: Swatinem/rust-cache@v2
       with:
         prefix-key: "v0-rust-${{ matrix.target }}"
+    - uses: cargo-bins/cargo-binstall@c635ad6f957466c7818a18cb88570757ee1002b3
+    - name: Install depends via cargo-install
+      run: |
+            cargo binstall tauri-cli --no-confirm
+            cargo binstall trunk --locked --no-confirm
     - name: Build
-      run: cargo tauri build --verbose --release
+      run: cargo tauri build --verbose --ci
     - name: Upload artifacts(Windows)
       uses: actions/upload-artifact@v4
       if: matrix.os == 'windows-latest'
