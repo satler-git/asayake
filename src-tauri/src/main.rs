@@ -9,7 +9,7 @@ use komorebi_client::{send_query, SocketMessage, State};
 use tauri::Manager as _;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
-use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem};
+use tauri::SystemTrayMenu;
 use winput::{
     message_loop::{self, EventReceiver},
     Action, Vk,
@@ -28,21 +28,25 @@ async fn main() -> Result<()> {
     let loop_break_rec = Arc::clone(&loop_break);
     let loop_break_system_tray = Arc::clone(&loop_break);
 
-    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let tray_menu = SystemTrayMenu::new().add_item(quit);
+    let tray_menu = SystemTrayMenu::new();
 
     let tray = SystemTray::new().with_menu(tray_menu);
 
     tauri::Builder::default()
         .system_tray(tray)
-        .on_system_tray_event(move |_app, event| match event { // TODO: 関数へ切り出し。とりあえずeventだけ投げれば良さそう
-            SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-                "quit" => {
-                    *loop_break_system_tray.write().unwrap() = true;
-                    std::process::exit(0);
-                }
-                _ => {}
-            },
+        .on_system_tray_event(move |app, event| match event { // TODO: 関数へ切り出し。とりあえずeventだけ投げれば良さそう
+            // SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+            //     "quit" => {
+            //         // *loop_break_system_tray.write().unwrap() = true;
+            //         // app.exit(0);
+            //     }
+            //     _ => {}
+            // },
+            SystemTrayEvent::DoubleClick { .. } => { // ダブルクリックで終了
+                println!("DoubleClick");
+                *loop_break_system_tray.write().unwrap() = true;
+                app.exit(0);
+            }
             _ => {}
         })
         .setup(|app| {
