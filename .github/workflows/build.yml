@@ -27,10 +27,13 @@ jobs:
     - name: Setup Rust toolchain and cli
       run: |
         rustup target add ${{ matrix.target }}
-        cargo install tauri-cli
     - uses: Swatinem/rust-cache@v2
       with:
         prefix-key: "v0-rust-${{ matrix.target }}"
+    - name: Install depends via cargo-install
+      run: |
+            cargo install tauri-cli
+            cargo install --locked trunk
     - name: Build
       run: cargo tauri build --verbose -- --release
     - name: Upload artifacts(Windows)
