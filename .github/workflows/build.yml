@@ -27,6 +27,7 @@ jobs:
     - name: Setup Rust toolchain and cli
       run: |
         rustup target add ${{ matrix.target }}
+        rustup target add wasm32-unknown-unknown
     - uses: Swatinem/rust-cache@v2
       with:
         prefix-key: "v0-rust-${{ matrix.target }}"

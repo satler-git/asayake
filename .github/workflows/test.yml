@@ -27,6 +27,7 @@ jobs:
     - name: Setup Rust toolchain and cli
       run: |
         rustup target add ${{ matrix.target }}
+        rustup target add wasm32-unknown-unknown
 #       rustup install nightly
 #       rustup +nightly component add miri
     - uses: Swatinem/rust-cache@v2
