@@ -5,12 +5,15 @@ use crate::img;
 
 use windows::Win32::Foundation::HWND;
 
-/// (base64, color)
 /// use komorebi_client::Window::hwnd for get hwnd
-pub fn extract_icon_base64_color_from_hwnd(hwnd_i: HWND) -> (String, u8) {
-    let icon = self::hwnd::get_icon_from_hwnd(hwnd_i.into()).unwrap();
-    (
-        img::convert_img_base64(&icon),
-        img::find_most_used_color(icon),
-    )
+impl From<HWND> for super::WindowForSend {
+    fn from(value: HWND) -> Self {
+        let icon = self::hwnd::get_icon_from_hwnd(value.into()).unwrap();
+        super::WindowForSend {
+            icon: super::Icon {
+                base64_icon: (img::convert_img_base64(&icon)),
+            },
+            accent_color: img::find_most_used_color(&icon),
+        }
+    }
 }

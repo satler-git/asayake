@@ -14,6 +14,6 @@ pub fn convert_img_base64(image_from: &DynamicImage) -> String {
 }
 
 /// 一番多く使われている色を`u8`で返す
-pub fn find_most_used_color(image: DynamicImage) -> u8 {
+pub fn find_most_used_color(image: &DynamicImage) -> u8 {
   todo!()
 }
