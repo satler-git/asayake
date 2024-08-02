@@ -1,5 +1,4 @@
-use crate::win_errors::*;
-use cursor_hero_math::prelude::bgra_to_rgba;
+use super::shuffle::bgra_to_rgba;
 use image::ImageBuffer;
 use image::RgbaImage;
 use itertools::Itertools;
@@ -18,6 +17,8 @@ use windows::Win32::UI::WindowsAndMessaging::DestroyIcon;
 use windows::Win32::UI::WindowsAndMessaging::GetIconInfoExW;
 use windows::Win32::UI::WindowsAndMessaging::HICON;
 use windows::Win32::UI::WindowsAndMessaging::ICONINFOEXW;
+
+use anyhow::{bail, Result, anyhow};
 
 pub fn get_images_from_exe(executable_path: &str) -> Result<Vec<RgbaImage>> {
     unsafe {
@@ -76,12 +77,12 @@ pub fn convert_hicon_to_rgba_image(hicon: &HICON) -> Result<RgbaImage> {
         icon_info.cbSize = std::mem::size_of::<ICONINFOEXW>() as u32;
 
         if !GetIconInfoExW(*hicon, &mut icon_info).as_bool() {
-            return Err(Error::from_win32().with_description(format!(
+            bail!(
                 "icon • GetIconInfoExW: {} {}:{}",
                 file!(),
                 line!(),
                 column!()
-            )));
+            );
         }
         let hdc_screen = CreateCompatibleDC(None);
         let hdc_mem = CreateCompatibleDC(hdc_screen);
@@ -115,31 +116,26 @@ pub fn convert_hicon_to_rgba_image(hicon: &HICON) -> Result<RgbaImage> {
             DIB_RGB_COLORS,
         ) == 0
         {
-            return Err(Error::from_win32().with_description(format!(
-                "GetDIBits: {} {}:{}",
-                file!(),
-                line!(),
-                column!()
-            )));
+            bail!("GetDIBits: {} {}:{}", file!(), line!(), column!());
         }
         // Clean up
         SelectObject(hdc_mem, hbm_old);
-        DeleteDC(hdc_mem);
-        DeleteDC(hdc_screen);
-        DeleteObject(icon_info.hbmColor);
-        DeleteObject(icon_info.hbmMask);
+        let _ = DeleteDC(hdc_mem);
+        let _ = DeleteDC(hdc_screen);
+        let _ = DeleteObject(icon_info.hbmColor);
+        let _ = DeleteObject(icon_info.hbmMask);
 
         bgra_to_rgba(buffer.as_mut_slice());
 
         let image = ImageBuffer::from_raw(icon_info.xHotspot * 2, icon_info.yHotspot * 2, buffer)
-            .ok_or_else(|| Error::ImageContainerNotBigEnough)?;
+            .ok_or_else(|| anyhow!("Image Container Not Big Enough"))?;
         return Ok(image);
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use bevy::math::IVec4;
+    use bevy_math::IVec4;
     use std::path::PathBuf;
 
     #[test]
