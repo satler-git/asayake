@@ -13,7 +13,7 @@ impl From<HWND> for super::WindowForSend {
             icon: super::Icon {
                 base64_icon: (img::convert_img_base64(&icon)),
             },
-            accent_color: img::find_most_used_color(&icon),
+            accent_color: img::find_most_used_color(&icon).unwrap(),
         }
     }
 }

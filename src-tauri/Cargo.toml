@@ -34,6 +34,7 @@ base64 = "0.22.1"
 image = "0.25.2"
 
 widestring = "1.1.0"
+fxhash = "0.2.1"
 
 [dependencies.windows]
 version = "0.58.0"

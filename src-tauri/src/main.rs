@@ -6,12 +6,11 @@ mod img;
 
 use std::sync::{Arc, RwLock};
 
-use anyhow::{Context as _, Result, anyhow};
+use anyhow::{Context as _, Result, anyhow, bail};
 
 use komorebi_client::{Window, Workspace};
 use komorebi_client::{send_query, SocketMessage, State};
-use serde::Serialize;
-use sonic_rs::Deserialize;
+use serde::{Deserialize, Serialize};
 use tauri::Manager as _;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
@@ -141,7 +140,7 @@ enum WorkspaceItem {
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 struct WindowForSend {
     icon: Icon,
-    accent_color: u8
+    accent_color: u32
 }
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
