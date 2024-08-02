@@ -1,16 +1,22 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod icon;
+mod img;
+
 use std::sync::{Arc, RwLock};
 
-use anyhow::{Context as _, Result};
+use anyhow::{Context as _, Result, anyhow};
 
+use komorebi_client::{Window, Workspace};
 use komorebi_client::{send_query, SocketMessage, State};
+use serde::Serialize;
+use sonic_rs::Deserialize;
 use tauri::Manager as _;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
 use tauri::SystemTrayMenu;
-use tauri_plugin_positioner::{WindowExt, Position};
+use tauri_plugin_positioner::{Position, WindowExt};
 use winput::{
     message_loop::{self, EventReceiver},
     Action, Vk,
@@ -36,7 +42,8 @@ async fn main() -> Result<()> {
     tauri::Builder::default()
         .plugin(tauri_plugin_positioner::init())
         .system_tray(tray)
-        .on_system_tray_event(move |app, event| match event { // TODO: 関数へ切り出し。とりあえずeventだけ投げれば良さそう
+        .on_system_tray_event(move |app, event| match event {
+            // TODO: 関数へ切り出し。とりあえずeventだけ投げれば良さそう
             // SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
             //     "quit" => {
             //         // *loop_break_system_tray.write().unwrap() = true;
@@ -44,7 +51,8 @@ async fn main() -> Result<()> {
             //     }
             //     _ => {}
             // },
-            SystemTrayEvent::DoubleClick { .. } => { // ダブルクリックで終了
+            SystemTrayEvent::DoubleClick { .. } => {
+                // ダブルクリックで終了
                 println!("DoubleClick");
                 *loop_break_system_tray.write().unwrap() = true;
                 app.exit(0);
@@ -61,8 +69,7 @@ async fn main() -> Result<()> {
                 let receiver = message_loop::start().unwrap();
                 let mut state = alt_state(&receiver, &false).unwrap();
                 main_window.hide().unwrap();
-                main_window
-                    .move_window(Position::TopCenter).unwrap();
+                main_window.move_window(Position::TopCenter).unwrap();
 
                 loop {
                     let old_state = state.clone();
@@ -107,10 +114,49 @@ fn alt_state(receiver: &EventReceiver, old_state: &bool) -> Result<bool> {
 }
 
 /// komorebiのステータスを取得します
-async fn komorebi_state() -> Result<State> {
+fn fetch_komorebi_state() -> Result<State> {
     sonic_rs::from_str(&send_query(&SocketMessage::State)?)
         .context("Unable to get the state of komorebi now.")
     // If you get this error.
     // You may be running a different versionof komorebi (We're using komorebi-client v0.1.28)
     // or, you may not running komorebi
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+struct AsayakeMonitorState {
+    monitor_index: usize,
+    focusing_workspace: usize,
+    workspaces: Vec<WorkspaceForSend>,
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+struct WorkspaceForSend {}
+
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+enum WorkspaceItem {
+    Window(WindowForSend),
+    WindowStack(Vec<WindowForSend>)
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+struct WindowForSend {
+    icon: Icon,
+    accent_color: u8
+}
+
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+struct Icon {
+    base64_icon: String,
+}
+
+impl From<&Workspace> for WorkspaceForSend {
+    fn from(value: &Workspace) -> Self {
+        todo!()
+    }
+}
+
+impl From<&Window> for WindowForSend {
+    fn from(value: &Window) -> Self {
+        todo!()
+    }
 }
