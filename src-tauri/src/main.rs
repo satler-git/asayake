@@ -6,7 +6,7 @@ mod img;
 
 use std::sync::{Arc, RwLock};
 
-use anyhow::{Context as _, Result, anyhow, bail};
+use anyhow::{Context as _, Result};
 
 use komorebi_client::{Window, Workspace};
 use komorebi_client::{send_query, SocketMessage, State};
