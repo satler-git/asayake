@@ -19,12 +19,6 @@ use winput::{
     Action, Vk,
 };
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[tokio::main]
 async fn main() -> Result<()> {
     let tray_menu = SystemTrayMenu::new();
@@ -100,7 +94,7 @@ async fn main() -> Result<()> {
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet, fetch_asayake_window_state])
+        .invoke_handler(tauri::generate_handler![fetch_asayake_window_state])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
