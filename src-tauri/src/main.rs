@@ -28,11 +28,6 @@ fn greet(name: &str) -> String {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let loop_break = Arc::new(RwLock::new(false));
-
-    let loop_break_rec = Arc::clone(&loop_break);
-    let loop_break_system_tray = Arc::clone(&loop_break);
-
     let tray_menu = SystemTrayMenu::new();
 
     let tray = SystemTray::new().with_menu(tray_menu);
@@ -52,7 +47,6 @@ async fn main() -> Result<()> {
             SystemTrayEvent::DoubleClick { .. } => {
                 // ダブルクリックで終了
                 println!("DoubleClick");
-                *loop_break_system_tray.write().unwrap() = true;
                 app.exit(0);
             }
             _ => {}
@@ -81,9 +75,6 @@ async fn main() -> Result<()> {
                             main_window.hide().unwrap();
                         }
                     }
-                    if *loop_break_rec.read().unwrap() {
-                        break;
-                    }
                 }
             });
             Ok(())
@@ -92,7 +83,6 @@ async fn main() -> Result<()> {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
-    *loop_break.write().unwrap() = true;
     Ok(())
 }
 
