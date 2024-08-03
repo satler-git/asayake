@@ -45,7 +45,6 @@ async fn main() -> Result<()> {
             // },
             SystemTrayEvent::DoubleClick { .. } => {
                 // ダブルクリックで終了
-                println!("DoubleClick");
                 app.exit(0);
             }
             _ => {}
