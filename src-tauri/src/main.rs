@@ -88,9 +88,11 @@ async fn main() -> Result<()> {
 
                 for incoming in notify_receiver.incoming() {
                     match incoming {
-                        Ok(_) => if main_window_notify.is_visible().unwrap() {
-                            // フロントエンド側に再レンダリングを要求
-                        },
+                        Ok(_) => {
+                            if main_window_notify.is_visible().unwrap() {
+                                // フロントエンド側に再レンダリングを要求
+                            }
+                        }
                         Err(_) => {
                             continue;
                         }

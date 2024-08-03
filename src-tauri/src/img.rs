@@ -1,6 +1,6 @@
 use anyhow::{bail, Context as _, Ok, Result};
-use image::{DynamicImage, Pixel, Rgba};
 use fxhash::FxHashMap;
+use image::{DynamicImage, Pixel, Rgba};
 
 /// pngをbase64_pngに変換する
 /// `format!("data:image/png;base64,{}", resp_base64)`
@@ -29,8 +29,8 @@ pub fn find_most_used_color(image: &DynamicImage) -> Result<u32> {
         let mut counts: FxHashMap<usize, u32> = FxHashMap::default();
 
         for pi in pixels {
-          let count = counts.entry(cast_rgbau8_to_usize(pi)).or_insert(0);
-          *count += 1;
+            let count = counts.entry(cast_rgbau8_to_usize(pi)).or_insert(0);
+            *count += 1;
         }
 
         let most_common_color = counts
@@ -60,19 +60,16 @@ mod tests {
     }
 
     fn check_one_colored_image(rgb: Rgb<u8>) -> Result<()> {
-      let image = &make_one_colored_image(&rgb)?;
-      let rgb_u32 = ((rgb[0] as u32) << 16) | ((rgb[1] as u32) << 8) | (rgb[2] as u32);
-      assert_eq!(
-        find_most_used_color(image)?,
-        rgb_u32
-      );
-      Ok(())
+        let image = &make_one_colored_image(&rgb)?;
+        let rgb_u32 = ((rgb[0] as u32) << 16) | ((rgb[1] as u32) << 8) | (rgb[2] as u32);
+        assert_eq!(find_most_used_color(image)?, rgb_u32);
+        Ok(())
     }
 
     #[test]
     fn one_colored_images() -> Result<()> {
-      check_one_colored_image(Rgb([255, 255, 255]))?;
-      check_one_colored_image(Rgb([0, 0, 0]))?;
-      Ok(())
+        check_one_colored_image(Rgb([255, 255, 255]))?;
+        check_one_colored_image(Rgb([0, 0, 0]))?;
+        Ok(())
     }
 }
