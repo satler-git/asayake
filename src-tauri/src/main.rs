@@ -5,7 +5,6 @@ mod icon;
 mod img;
 
 use core::panic;
-use std::sync::{Arc, RwLock};
 
 use anyhow::{Context as _, Result};
 use komorebi_client::{send_query, Layout, SocketMessage, State};
@@ -52,7 +51,8 @@ async fn main() -> Result<()> {
             _ => {}
         })
         .setup(|app| {
-            let main_window = app.get_window("main").unwrap();
+            let main_window_alt = app.get_window("main").unwrap();
+            let main_window_notify = app.get_window("main").unwrap();
 
             tokio::task::spawn(async move {
                 // Altキーの監視
@@ -60,8 +60,8 @@ async fn main() -> Result<()> {
                 // メモ: asyncブロックはfutureを返す。だからmoveしている変数だけ引数にしてasync関数をつくればいい
                 let receiver = message_loop::start().unwrap();
                 let mut state = alt_state(&receiver, &false).unwrap();
-                main_window.hide().unwrap();
-                main_window.move_window(Position::TopCenter).unwrap();
+                main_window_alt.hide().unwrap();
+                main_window_alt.move_window(Position::TopCenter).unwrap();
 
                 loop {
                     let old_state = state.clone();
@@ -69,10 +69,30 @@ async fn main() -> Result<()> {
                     if old_state != state {
                         if state {
                             // Windowを表示して描画。イベントを送る。
-                            main_window.show().unwrap();
+                            main_window_alt.show().unwrap();
                         } else {
                             // Windowを隠す
-                            main_window.hide().unwrap();
+                            main_window_alt.hide().unwrap();
+                        }
+                    }
+                }
+            });
+
+            tokio::task::spawn(async move {
+                // komorebiの通知の監視
+                // TODO: 関数へ切り出し
+                // メモ: asyncブロックはfutureを返す。だからmoveしている変数だけ引数にしてasync関数をつくればいい
+                let notify_receiver = komorebi_client::subscribe("komorebi.sock")
+                    .context("Unable to subscribe notifyes from komorebi now.")
+                    .unwrap();
+
+                for incoming in notify_receiver.incoming() {
+                    match incoming {
+                        Ok(_) => if main_window_notify.is_visible().unwrap() {
+                            // フロントエンド側に再レンダリングを要求
+                        },
+                        Err(_) => {
+                            continue;
                         }
                     }
                 }
