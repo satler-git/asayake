@@ -4,12 +4,12 @@
 mod icon;
 mod img;
 
+use core::panic;
 use std::sync::{Arc, RwLock};
 
 use anyhow::{Context as _, Result};
-
-use komorebi_client::{Window, Workspace};
-use komorebi_client::{send_query, SocketMessage, State};
+use komorebi_client::{send_query, Layout, SocketMessage, State};
+use komorebi_client::{Monitor, Window, Workspace};
 use tauri::Manager as _;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
@@ -88,7 +88,7 @@ async fn main() -> Result<()> {
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![greet, fetch_asayake_window_state])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
@@ -123,14 +123,95 @@ fn fetch_komorebi_state() -> Result<State> {
 // HACK: クレートを分割するとimplできないという制約を乗り越えるための方法。醜い
 include!("./structs.rs");
 
+impl From<&Monitor> for AsayakeMonitorState {
+    fn from(value: &Monitor) -> Self {
+        let workspaces = value.workspaces();
+        let focusing_workspace = value.focused_workspace_idx();
+
+        let mut workspaces_for_send: Vec<WorkspaceForSend> = vec![];
+
+        for woi in workspaces {
+            workspaces_for_send.push(woi.into());
+        }
+
+        AsayakeMonitorState {
+            monitor_id: value.id(),
+            focusing_workspace: focusing_workspace,
+            workspaces: workspaces_for_send,
+        }
+    }
+}
+
 impl From<&Workspace> for WorkspaceForSend {
     fn from(value: &Workspace) -> Self {
-        todo!()
+        let mut container_for_send: Vec<ContainerForSend> = vec![];
+
+        let containers = value.containers();
+
+        for coni in containers {
+            container_for_send.push(coni.into());
+        }
+
+        WorkspaceForSend {
+            items: container_for_send,
+            layout: value.layout().into(),
+        }
+    }
+}
+
+impl From<&Layout> for LayoutForSend {
+    fn from(value: &Layout) -> Self {
+        if let Layout::Default(default_layout_kind) = value {
+            LayoutForSend::Default(match default_layout_kind {
+                komorebi_client::DefaultLayout::BSP => DefaultLayout::BSP,
+                komorebi_client::DefaultLayout::Columns => DefaultLayout::Columns,
+                komorebi_client::DefaultLayout::Rows => DefaultLayout::Rows,
+                komorebi_client::DefaultLayout::VerticalStack => DefaultLayout::VerticalStack,
+                komorebi_client::DefaultLayout::HorizontalStack => DefaultLayout::HorizontalStack,
+                komorebi_client::DefaultLayout::UltrawideVerticalStack => {
+                    DefaultLayout::UltrawideVerticalStack
+                }
+                komorebi_client::DefaultLayout::Grid => DefaultLayout::Grid,
+                komorebi_client::DefaultLayout::RightMainVerticalStack => {
+                    DefaultLayout::RightMainVerticalStack
+                }
+            })
+        } else {
+            panic!("Unable to parse custom layout, asayake still doesn't have compatibility for custom layout");
+        }
+    }
+}
+
+impl From<&komorebi_client::Container> for ContainerForSend {
+    fn from(value: &komorebi_client::Container) -> Self {
+        let mut window_for_send: Vec<WindowForSend> = vec![];
+
+        let windows = value.windows();
+
+        for wini in windows {
+            window_for_send.push(wini.into());
+        }
+
+        ContainerForSend {
+            windows: window_for_send,
+        }
     }
 }
 
 impl From<&Window> for WindowForSend {
     fn from(value: &Window) -> Self {
-        todo!()
+        value.hwnd().into()
     }
+}
+
+/// KomorebiのStateをWindow向けに処理して返します
+/// * `window_num` zero-based indeex
+// TODO: Fromトレイトを実装して`From<&Monitor> for AsayakeMonitorState`を使って変換するようにする
+#[tauri::command]
+fn fetch_asayake_window_state(window_num: usize) -> AsayakeMonitorState {
+    // komorebiの状態から自分のモニターを抜き出す
+    let komorebi_state = fetch_komorebi_state().unwrap();
+    let monitor = komorebi_state.monitors.elements().get(window_num).unwrap();
+
+    monitor.into()
 }
