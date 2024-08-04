@@ -35,6 +35,7 @@ pub fn find_most_used_color(image: &DynamicImage) -> Result<u32> {
 
         let most_common_color = counts
             .iter()
+            .filter(|&(&x, _)| x != (0 as usize))
             .max_by_key(|i| i.1)
             .context("Unable to find the most common color")?;
 
