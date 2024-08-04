@@ -12,7 +12,8 @@ pub fn convert_img_base64(image_from: &DynamicImage) -> String {
             image::ImageFormat::Png,
         )
         .unwrap();
-    base64::Engine::encode(&base64::engine::general_purpose::STANDARD, image_data)
+    let resp_base64 = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, image_data);
+    format!("data:image/png;base64,{}", resp_base64)
 }
 
 fn cast_rgbau8_to_usize(rgba: &Rgba<u8>) -> usize {
