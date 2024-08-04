@@ -1,42 +1,42 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
-struct AsayakeMonitorState {
-    monitor_id: isize,
-    focusing_workspace: usize,
-    workspaces: Vec<WorkspaceForSend>,
+pub struct AsayakeMonitorState {
+    pub monitor_id: isize,
+    pub focusing_workspace: usize,
+    pub workspaces: Vec<WorkspaceForSend>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
-struct WorkspaceForSend {
-    items: Vec<ContainerForSend>,
-    layout: LayoutForSend
+pub struct WorkspaceForSend {
+    pub items: Vec<ContainerForSend>,
+    pub layout: LayoutForSend
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
-struct ContainerForSend {
-    windows: Vec<WindowForSend>,
+pub struct ContainerForSend {
+    pub windows: Vec<WindowForSend>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
-struct WindowForSend {
-    icon: Icon,
-    accent_color: u32
+pub struct WindowForSend {
+    pub icon: Icon,
+    pub accent_color: u32
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
-struct Icon {
-    base64_icon: String,
+pub struct Icon {
+    pub base64_icon: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
-enum LayoutForSend {
+pub enum LayoutForSend {
     Default(DefaultLayout),
     // Custom(CustomLayout),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
-enum DefaultLayout {
+pub enum DefaultLayout {
     BSP,
     Columns,
     Rows,
