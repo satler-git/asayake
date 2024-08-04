@@ -45,7 +45,6 @@ async fn main() -> Result<()> {
         })
         .setup(|app| {
             let main_window_alt = app.get_window("main").unwrap();
-            let main_window_notify = app.get_window("main").unwrap();
 
             tokio::task::spawn(async move {
                 // Altキーの監視
@@ -71,6 +70,9 @@ async fn main() -> Result<()> {
                 }
             });
 
+            let main_window_notify = app.get_window("main").unwrap();
+            let app_handle = app.app_handle();
+
             tokio::task::spawn(async move {
                 // komorebiの通知の監視
                 // TODO: 関数へ切り出し
@@ -84,6 +86,9 @@ async fn main() -> Result<()> {
                         Ok(_) => {
                             if main_window_notify.is_visible().unwrap() {
                                 // フロントエンド側に再レンダリングを要求
+                                app_handle
+                                    .emit_all("back-to-front", "re-rendering".to_string())
+                                    .unwrap();
                             }
                         }
                         Err(_) => {
@@ -219,4 +224,21 @@ fn fetch_asayake_window_state(window_num: usize) -> AsayakeMonitorState {
     let monitor = komorebi_state.monitors.elements().get(window_num).unwrap();
 
     monitor.into()
+}
+
+#[cfg(test)]
+mod tests {
+    use anyhow::{Result, Ok};
+
+    use crate::fetch_asayake_window_state;
+    use std::io::Write;
+    use std::fs::File;
+
+    #[test]
+    #[ignore]
+    fn test_fetch_asayake_window_state_run() -> Result<()> {
+        let mut output = File::create("example_asayake_state.dpp")?;
+        write!(output, "{:?}", fetch_asayake_window_state(0))?;
+        Ok(())
+    }
 }
