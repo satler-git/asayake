@@ -7,15 +7,17 @@ use serde_wasm_bindgen::to_value;
 
 use wasm_bindgen::prelude::*;
 
-use yew::{platform::spawn_local, prelude::*, virtual_dom::VNode};
+use yew::{platform::{spawn_local, time::sleep}, prelude::*, virtual_dom::VNode};
 
-use std::sync::{Arc, RwLock};
+use std::time::Duration;
 
 include!("./structs.rs");
 
+const ONE_SEC: Duration = Duration::from_secs(1);
+
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 struct Event {
-    payload: String,
+    pub payload: AsayakeMonitorState,
 }
 
 #[wasm_bindgen]
@@ -49,9 +51,11 @@ pub fn App() -> Html {
 
     if *first {
         first.set(false);
+        let asayake_state = asayake_state.clone();
         spawn_local(async move {
             loop {
-                
+                asayake_state.set(fetch_asayake_state(0).await.unwrap());
+                sleep(ONE_SEC).await;
             }
         })
     }
