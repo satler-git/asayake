@@ -45,6 +45,13 @@ async fn main() -> Result<()> {
         })
         .setup(|app| {
             let main_window_alt = app.get_window("main").unwrap();
+            let app_handle = app.app_handle();
+
+            #[cfg(debug_assertions)] // only include this code on debug builds
+            {
+                let window = app.get_window("main").unwrap();
+                window.open_devtools();
+            }
 
             tokio::task::spawn(async move {
                 // Altキーの監視
@@ -61,6 +68,9 @@ async fn main() -> Result<()> {
                     if old_state != state {
                         if state {
                             // Windowを表示して描画。イベントを送る。
+                            app_handle
+                                    .emit_all("back-to-front", "re-rendering".to_string())
+                                    .unwrap();
                             main_window_alt.show().unwrap();
                         } else {
                             // Windowを隠す
@@ -71,7 +81,7 @@ async fn main() -> Result<()> {
             });
 
             let main_window_notify = app.get_window("main").unwrap();
-            let app_handle = app.app_handle();
+            let app_handle_notify = app.app_handle();
 
             tokio::task::spawn(async move {
                 // komorebiの通知の監視
@@ -86,7 +96,7 @@ async fn main() -> Result<()> {
                         Ok(_) => {
                             if main_window_notify.is_visible().unwrap() {
                                 // フロントエンド側に再レンダリングを要求
-                                app_handle
+                                app_handle_notify
                                     .emit_all("back-to-front", "re-rendering".to_string())
                                     .unwrap();
                             }
@@ -218,21 +228,21 @@ impl From<&Window> for WindowForSend {
 /// * `window_num` zero-based indeex
 // TODO: Fromトレイトを実装して`From<&Monitor> for AsayakeMonitorState`を使って変換するようにする
 #[tauri::command]
-fn fetch_asayake_window_state(window_num: usize) -> AsayakeMonitorState {
+fn fetch_asayake_window_state(window_num: u64) -> AsayakeMonitorState {
     // komorebiの状態から自分のモニターを抜き出す
     let komorebi_state = fetch_komorebi_state().unwrap();
-    let monitor = komorebi_state.monitors.elements().get(window_num).unwrap();
+    let monitor = komorebi_state.monitors.elements().get(window_num as usize).unwrap();
 
     monitor.into()
 }
 
 #[cfg(test)]
 mod tests {
-    use anyhow::{Result, Ok};
+    use anyhow::{Ok, Result};
 
     use crate::fetch_asayake_window_state;
-    use std::io::Write;
     use std::fs::File;
+    use std::io::Write;
 
     #[test]
     #[ignore]
