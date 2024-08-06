@@ -18,7 +18,7 @@ use windows::Win32::UI::WindowsAndMessaging::GetIconInfoExW;
 use windows::Win32::UI::WindowsAndMessaging::HICON;
 use windows::Win32::UI::WindowsAndMessaging::ICONINFOEXW;
 
-use anyhow::{bail, Result, anyhow};
+use anyhow::{anyhow, bail, Result};
 
 pub fn get_images_from_exe(executable_path: &str) -> Result<Vec<RgbaImage>> {
     unsafe {

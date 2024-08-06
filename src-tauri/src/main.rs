@@ -43,7 +43,6 @@ async fn main() -> Result<()> {
             // },
             SystemTrayEvent::DoubleClick { .. } => {
                 // ダブルクリックで終了
-                println!("DoubleClick");
                 app.exit(0);
             }
             _ => {}
@@ -80,15 +79,17 @@ async fn main() -> Result<()> {
                 // komorebiの通知の監視
                 // TODO: 関数へ切り出し
                 // メモ: asyncブロックはfutureを返す。だからmoveしている変数だけ引数にしてasync関数をつくればいい
-                let notify_receiver = komorebi_client::subscribe("komorebi.sock")
+                let notify_receiver = komorebi_client::subscribe("asayake")
                     .context("Unable to subscribe notifyes from komorebi now.")
                     .unwrap();
 
                 for incoming in notify_receiver.incoming() {
                     match incoming {
-                        Ok(_) => if main_window_notify.is_visible().unwrap() {
-                            // フロントエンド側に再レンダリングを要求
-                        },
+                        Ok(_) => {
+                            if main_window_notify.is_visible().unwrap() {
+                                // フロントエンド側に再レンダリングを要求
+                            }
+                        }
                         Err(_) => {
                             continue;
                         }
