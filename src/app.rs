@@ -1,24 +1,17 @@
 use anyhow::{Context as _, Result};
 
-use gloo_utils::format::JsValueSerdeExt;
-
 use serde::{Deserialize, Serialize};
-use serde_wasm_bindgen::{from_value, to_value};
+use serde_wasm_bindgen::from_value;
 
 use wasm_bindgen::prelude::*;
 
 use yew::{
-    platform::{spawn_local, time::sleep},
+    platform::spawn_local,
     prelude::*,
     virtual_dom::VNode,
 };
 
-use std::time::Duration;
-
 include!("./structs.rs");
-
-const ONE_SEC: Duration = Duration::from_secs(1);
-const THERTY_MS: Duration = Duration::from_millis(300);
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 struct Event {
@@ -39,15 +32,6 @@ struct FetchAsayakeStateArgs {
     window_num: u64,
 }
 
-async fn fetch_asayake_state(window_num: u64) -> Result<AsayakeMonitorState> {
-    let args = to_value(&FetchAsayakeStateArgs { window_num }).unwrap();
-    let asayake_monitor_state: Result<AsayakeMonitorState, _> =
-        invoke("fetch_asayake_window_state", args)
-            .await
-            .into_serde();
-    asayake_monitor_state.context("Unable to fetch the state of asayake")
-}
-
 #[function_component()]
 pub fn App() -> Html {
     let asayake_state = use_state_eq(|| AsayakeMonitorState::default());
@@ -64,10 +48,6 @@ pub fn App() -> Html {
                 });
                 let _ = listen("re-rendering", handler.as_ref().unchecked_ref()).await;
                 handler.forget();
-                loop {
-                    // asayake_state.set(fetch_asayake_state(0).await.unwrap());
-                    sleep(ONE_SEC).await;
-                }
             })
         });
     }
