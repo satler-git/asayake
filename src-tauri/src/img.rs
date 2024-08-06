@@ -4,15 +4,14 @@ use image::{DynamicImage, Rgba};
 
 /// pngをbase64_pngに変換する
 /// `format!("data:image/png;base64,{}", resp_base64)`
-pub fn convert_img_base64(image_from: &DynamicImage) -> String {
+pub fn convert_img_base64(image_from: &DynamicImage) -> Result<String> {
     let mut image_data: Vec<u8> = Vec::new();
     image_from
         .write_to(
             &mut std::io::Cursor::new(&mut image_data),
             image::ImageFormat::Png,
-        )
-        .unwrap();
-    base64::Engine::encode(&base64::engine::general_purpose::STANDARD, image_data)
+        ).context("Unable to convert an icon to base64 string")?;
+    Ok(base64::Engine::encode(&base64::engine::general_purpose::STANDARD, image_data))
 }
 
 /// 一番多く使われている色を`u32`で返す

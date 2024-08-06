@@ -4,9 +4,7 @@
 mod icon;
 mod img;
 
-use core::panic;
-
-use anyhow::{Context as _, Result};
+use anyhow::{Context as _, Result, anyhow};
 use komorebi_client::{send_query, Layout, SocketMessage, State};
 use komorebi_client::{Monitor, Window, Workspace};
 use tauri::Manager as _;
@@ -134,46 +132,52 @@ fn fetch_komorebi_state() -> Result<State> {
 // HACK: クレートを分割するとimplできないという制約を乗り越えるための方法。醜い
 include!("./structs.rs");
 
-impl From<&Monitor> for AsayakeMonitorState {
-    fn from(value: &Monitor) -> Self {
+impl TryFrom<&Monitor> for AsayakeMonitorState {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &Monitor) -> Result<Self, Self::Error> {
         let workspaces = value.workspaces();
         let focusing_workspace = value.focused_workspace_idx();
 
         let mut workspaces_for_send: Vec<WorkspaceForSend> = vec![];
 
         for woi in workspaces {
-            workspaces_for_send.push(woi.into());
+            workspaces_for_send.push(woi.try_into()?);
         }
 
-        AsayakeMonitorState {
+        Ok(AsayakeMonitorState {
             monitor_id: value.id(),
             focusing_workspace: focusing_workspace,
             workspaces: workspaces_for_send,
-        }
+        })
     }
 }
 
-impl From<&Workspace> for WorkspaceForSend {
-    fn from(value: &Workspace) -> Self {
+impl TryFrom<&Workspace> for WorkspaceForSend {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &Workspace) -> Result<Self, Self::Error> {
         let mut container_for_send: Vec<ContainerForSend> = vec![];
 
         let containers = value.containers();
 
         for coni in containers {
-            container_for_send.push(coni.into());
+            container_for_send.push(coni.try_into()?);
         }
 
-        WorkspaceForSend {
+        Ok(WorkspaceForSend {
             items: container_for_send,
-            layout: value.layout().into(),
-        }
+            layout: value.layout().try_into()?,
+        })
     }
 }
 
-impl From<&Layout> for LayoutForSend {
-    fn from(value: &Layout) -> Self {
+impl TryFrom<&Layout> for LayoutForSend {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &Layout) -> Result<Self, Self::Error> {
         if let Layout::Default(default_layout_kind) = value {
-            LayoutForSend::Default(match default_layout_kind {
+            Ok(LayoutForSend::Default(match default_layout_kind {
                 komorebi_client::DefaultLayout::BSP => DefaultLayout::BSP,
                 komorebi_client::DefaultLayout::Columns => DefaultLayout::Columns,
                 komorebi_client::DefaultLayout::Rows => DefaultLayout::Rows,
@@ -186,32 +190,36 @@ impl From<&Layout> for LayoutForSend {
                 komorebi_client::DefaultLayout::RightMainVerticalStack => {
                     DefaultLayout::RightMainVerticalStack
                 }
-            })
+            }))
         } else {
-            panic!("Unable to parse custom layout, asayake still doesn't have compatibility for custom layout");
+            Err(anyhow!("Unable to parse custom layout, asayake still doesn't have compatibility for custom layout"))
         }
     }
 }
 
-impl From<&komorebi_client::Container> for ContainerForSend {
-    fn from(value: &komorebi_client::Container) -> Self {
+impl TryFrom<&komorebi_client::Container> for ContainerForSend {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &komorebi_client::Container) -> Result<Self, Self::Error> {
         let mut window_for_send: Vec<WindowForSend> = vec![];
 
         let windows = value.windows();
 
         for wini in windows {
-            window_for_send.push(wini.into());
+            window_for_send.push(wini.try_into()?);
         }
 
-        ContainerForSend {
+        Ok(ContainerForSend {
             windows: window_for_send,
-        }
+        })
     }
 }
 
-impl From<&Window> for WindowForSend {
-    fn from(value: &Window) -> Self {
-        value.hwnd().into()
+impl TryFrom<&Window> for WindowForSend {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &Window) -> Result<Self, Self::Error> {
+        Ok(value.hwnd().try_into()?)
     }
 }
 
@@ -224,5 +232,5 @@ fn fetch_asayake_window_state(window_num: usize) -> AsayakeMonitorState {
     let komorebi_state = fetch_komorebi_state().unwrap();
     let monitor = komorebi_state.monitors.elements().get(window_num).unwrap();
 
-    monitor.into()
+    monitor.try_into().unwrap()
 }

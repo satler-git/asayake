@@ -12,14 +12,16 @@ fn cast_rgbau8_to_u32(rgba: &Rgba<u8>) -> u32 {
 }
 
 /// use komorebi_client::Window::hwnd for get hwnd
-impl From<HWND> for super::WindowForSend {
-    fn from(value: HWND) -> Self {
-        let icon = self::hwnd::get_icon_from_hwnd(value.into()).unwrap();
-        super::WindowForSend {
+impl TryFrom<HWND> for super::WindowForSend {
+    type Error = anyhow::Error;
+
+    fn try_from(value: HWND) -> Result<Self, Self::Error> {
+        let icon = self::hwnd::get_icon_from_hwnd(value.into())?;
+        Ok(super::WindowForSend {
             icon: super::Icon {
-                base64_icon: (img::convert_img_base64(&icon)),
+                base64_icon: (img::convert_img_base64(&icon)?),
             },
             accent_color: cast_rgbau8_to_u32(&img::find_most_used_color(&icon).unwrap()),
-        }
+        })
     }
 }
