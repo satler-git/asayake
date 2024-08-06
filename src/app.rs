@@ -3,7 +3,7 @@ use anyhow::{Context as _, Result};
 use gloo_utils::format::JsValueSerdeExt;
 
 use serde::{Deserialize, Serialize};
-use serde_wasm_bindgen::to_value;
+use serde_wasm_bindgen::{from_value, to_value};
 
 use wasm_bindgen::prelude::*;
 
@@ -57,11 +57,15 @@ pub fn App() -> Html {
         use_effect_with((), move |_| {
             let asayake_state = asayake_state.clone();
             spawn_local(async move {
-                let handler = Closure::<dyn FnMut(_)>::new(move |_: JsValue| {});
+                let handler = Closure::<dyn FnMut(_)>::new(move |s: JsValue| {
+                    if let Ok(res) = from_value::<Event>(s) {
+                        asayake_state.set(res.payload);
+                    }
+                });
                 let _ = listen("re-rendering", handler.as_ref().unchecked_ref()).await;
                 handler.forget();
                 loop {
-                    asayake_state.set(fetch_asayake_state(0).await.unwrap());
+                    // asayake_state.set(fetch_asayake_state(0).await.unwrap());
                     sleep(ONE_SEC).await;
                 }
             })

@@ -69,7 +69,7 @@ async fn main() -> Result<()> {
                         if state {
                             // Windowを表示して描画。イベントを送る。
                             app_handle
-                                    .emit_all("re-rendering", ())
+                                    .emit_all("re-rendering", fetch_asayake_window_state(0))
                                     .unwrap();
                             main_window_alt.show().unwrap();
                         } else {
@@ -97,7 +97,7 @@ async fn main() -> Result<()> {
                             if main_window_notify.is_visible().unwrap() {
                                 // フロントエンド側に再レンダリングを要求
                                 app_handle_notify
-                                    .emit_all("re-rendering", ())
+                                    .emit_all("re-rendering", fetch_asayake_window_state(0))
                                     .unwrap();
                             }
                         }
