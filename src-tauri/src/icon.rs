@@ -22,6 +22,6 @@ impl TryFrom<HWND> for super::WindowForSend {
                 base64_icon: (img::convert_img_base64(&icon)?),
             },
             accent_color: cast_rgbau8_to_u32(&img::find_most_used_color(&icon).unwrap()),
-        }
+        })
     }
 }
