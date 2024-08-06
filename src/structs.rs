@@ -22,6 +22,7 @@ pub struct ContainerForSend {
 
 #[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Hash)]
 pub struct WindowForSend {
+    pub id: u64,
     pub icon: Icon,
     pub accent_color: u32,
 }
@@ -54,7 +55,33 @@ impl Default for AsayakeMonitorState {
         AsayakeMonitorState {
             monitor_id: 0,
             focusing_workspace: 0,
-            workspaces: vec![]
+            workspaces: vec![],
+        }
+    }
+}
+
+impl Default for ContainerForSend {
+    fn default() -> Self {
+        ContainerForSend {
+            windows: vec![],
+        }
+    }
+}
+
+impl Default for WindowForSend {
+    fn default() -> Self {
+        WindowForSend {
+            id: 0,
+            icon: Icon::default(),
+            accent_color: 0xFFFFFF,
+        }
+    }
+}
+
+impl Default for Icon {
+    fn default() -> Self {
+        Icon {
+            base64_icon: "".into(),
         }
     }
 }
