@@ -5,13 +5,17 @@ pub struct AsayakeMonitorState {
     pub workspaces: Vec<WorkspaceForSend>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Hash, yew::Properties)]
+#[derive(
+    Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Hash, yew::Properties,
+)]
 pub struct WorkspaceForSend {
     pub items: Vec<ContainerForSend>,
-    pub layout: LayoutForSend
+    pub layout: LayoutForSend,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Hash, yew::Properties)]
+#[derive(
+    Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Hash, yew::Properties
+)]
 pub struct ContainerForSend {
     pub windows: Vec<WindowForSend>,
 }
@@ -19,7 +23,7 @@ pub struct ContainerForSend {
 #[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Hash)]
 pub struct WindowForSend {
     pub icon: Icon,
-    pub accent_color: u32
+    pub accent_color: u32,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Hash)]
