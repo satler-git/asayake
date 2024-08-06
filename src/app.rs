@@ -7,13 +7,18 @@ use serde_wasm_bindgen::to_value;
 
 use wasm_bindgen::prelude::*;
 
-use yew::{platform::{spawn_local, time::sleep}, prelude::*, virtual_dom::VNode};
+use yew::{
+    platform::{spawn_local, time::sleep},
+    prelude::*,
+    virtual_dom::VNode,
+};
 
 use std::time::Duration;
 
 include!("./structs.rs");
 
 const ONE_SEC: Duration = Duration::from_secs(1);
+const THERTY_MS: Duration = Duration::from_millis(300);
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 struct Event {
@@ -45,19 +50,22 @@ async fn fetch_asayake_state(window_num: u64) -> Result<AsayakeMonitorState> {
 
 #[function_component()]
 pub fn App() -> Html {
-    let asayake_state = use_state(|| AsayakeMonitorState::default());
+    let asayake_state = use_state_eq(|| AsayakeMonitorState::default());
 
-    let first = use_state(|| true);
-
-    if *first {
-        first.set(false);
+    {
         let asayake_state = asayake_state.clone();
-        spawn_local(async move {
-            loop {
-                asayake_state.set(fetch_asayake_state(0).await.unwrap());
-                sleep(ONE_SEC).await;
-            }
-        })
+        use_effect_with((), move |_| {
+            let asayake_state = asayake_state.clone();
+            spawn_local(async move {
+                let handler = Closure::<dyn FnMut(_)>::new(move |_: JsValue| {});
+                let _ = listen("re-rendering", handler.as_ref().unchecked_ref()).await;
+                handler.forget();
+                loop {
+                    asayake_state.set(fetch_asayake_state(0).await.unwrap());
+                    sleep(ONE_SEC).await;
+                }
+            })
+        });
     }
 
     let workspaces = use_memo(asayake_state, |asayake_state| {
