@@ -18,6 +18,8 @@ yew = {version = "0.21.0", features = ["csr"]}
 log = "0.4.22"
 wasm-logger = "0.2.0"
 gloo = "0.11.0"
+fxhash = "0.2.1"
+rand = "0.8.5"
 
 [workspace]
 members = ["src-tauri"]

@@ -35,6 +35,7 @@ image = "0.25.2"
 
 widestring = "1.1.0"
 fxhash = "0.2.1"
+rand = "0.8.5"
 
 [dependencies.windows]
 version = "0.54.0"
