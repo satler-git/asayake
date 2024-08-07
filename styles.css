@@ -19,39 +19,47 @@
 
 .container {
   width: 550px; /* 幅を調整 */
-  height: 90; /* 高さを調整 */
+  height: 90px; /* 高さを調整 */
   background-color: var(--color-primary);
   border-radius: 0 0 8px 8px; /* 下の角を丸める */
   margin: 0 auto; /* 中央に配置 */
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2); /* 影を追加 */
   position: relative;
+  top: -8px;
+  /* padding */
+  padding-left:   32.5px;
+  padding-right:  32.5px;
+  padding-top:    18px;
+  padding-bottom: 5px;
   /* flexの設定 */
   display: flex;
   justify-content: center;
   flex-wrap: nowrap;
   flex-direction: row;
   align-items:center;
-  column-gap: 23;
+  gap: 23px;
 }
 
 .container:before, .container:after {
   content: "";
   position: absolute;
-  width: 40px; /* 飛び出し部分の幅 */
-  height: 40px; /* 飛び出し部分の高さ */
-  background-color: var(--color-primary); /* 背景色を本体と一致させる */
-  top: -20px; /* 上に飛び出させる位置 */
-  border-radius: 50%; /* 丸くする */
+  width:  8px; /* 飛び出し部分の幅 */
+  height: 8px; /* 飛び出し部分の高さ */
+  top: 0px;
 }
 
 /* 左上の飛び出し部分 */
 .container:before {
-  left: -20px; /* 左に飛び出させる位置 */
+  content: "";
+  background-image: url("public/left.svg");
+  left: -8px;
 }
 
 /* 右上の飛び出し部分 */
 .container:after {
-  right: -20px; /* 右に飛び出させる位置 */
+  content: "";
+  background-image: url("public/right.svg");
+  right: -8px;
 }
 
 .workspace {

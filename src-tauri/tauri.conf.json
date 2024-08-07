@@ -21,7 +21,6 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
         "resizable": false,
         "closable": false,
         "focus": false,
@@ -31,7 +30,8 @@
         "transparent": true,
         "decorations": false,
         "title": "asayake",
-        "width": 800
+        "height": 140,
+        "width": 1920
       }
     ],
     "systemTray": {
