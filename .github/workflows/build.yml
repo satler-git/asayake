@@ -38,12 +38,18 @@ jobs:
             cargo binstall trunk --locked --no-confirm
     - name: Build
       run: cargo tauri build --verbose --ci
+    - name: Move files
+      run: |
+        cd target/release
+        mkdir nightly
+        mv asayake.exe nightly/
+        cp ./bundle/* ./nightly/
     - name: Upload artifacts(Windows)
       uses: actions/upload-artifact@v4
       if: matrix.os == 'windows-latest'
       with:
         name: nighty-${{ github.sha }}-${{ matrix.target }}
-        path: ./target/release/asayake.exe
+        path: ./target/nightly
 #    - name: Upload artifacts(not Windows)
 #      uses: actions/upload-artifact@v4
 #      if: matrix.os != 'windows-latest'
