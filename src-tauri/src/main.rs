@@ -240,7 +240,7 @@ fn fetch_asayake_window_state(window_num: u64) -> AsayakeMonitorState {
 mod tests {
     use anyhow::{Ok, Result};
 
-    use crate::fetch_asayake_window_state;
+    use crate::{fetch_asayake_window_state, fetch_komorebi_state};
     use std::fs::File;
     use std::io::Write;
 
@@ -249,6 +249,13 @@ mod tests {
     fn test_fetch_asayake_window_state_run() -> Result<()> {
         let mut output = File::create("example_asayake_state.dpp")?;
         write!(output, "{:?}", fetch_asayake_window_state(0))?;
+        Ok(())
+    }
+
+    #[test]
+    #[ignore]
+    fn test_fetch_komorebi_state() -> Result<()> {
+        fetch_komorebi_state().unwrap();
         Ok(())
     }
 }
