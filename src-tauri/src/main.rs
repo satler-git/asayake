@@ -47,6 +47,9 @@ async fn main() -> Result<()> {
             let main_window_alt = app.get_window("main").unwrap();
             let app_handle = app.app_handle();
 
+            main_window_alt.hide().unwrap();
+            main_window_alt.move_window(Position::TopCenter).unwrap();
+
             #[cfg(debug_assertions)] // only include this code on debug builds
             {
                 let window = app.get_window("main").unwrap();
@@ -59,8 +62,6 @@ async fn main() -> Result<()> {
                 // メモ: asyncブロックはfutureを返す。だからmoveしている変数だけ引数にしてasync関数をつくればいい
                 let receiver = message_loop::start().unwrap();
                 let mut state = alt_state(&receiver, &false).unwrap();
-                main_window_alt.hide().unwrap();
-                main_window_alt.move_window(Position::TopCenter).unwrap();
 
                 loop {
                     let old_state = state.clone();
