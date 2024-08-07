@@ -132,9 +132,10 @@ fn alt_state(receiver: &EventReceiver, old_state: &bool) -> Result<bool> {
 }
 
 /// komorebiのステータスを取得します
+// TODO: timeoutの実装
 fn fetch_komorebi_state() -> Result<State> {
-    sonic_rs::from_str(&send_query(&SocketMessage::State)?)
-        .context("Unable to get the state of komorebi now.")
+    sonic_rs::from_str(&send_query(&SocketMessage::State).context("Unable to get the state of komorebi now.")?)
+        .context("Unable to parse the state of komorebi.")
     // If you get this error.
     // You may be running a different versionof komorebi (We're using komorebi-client v0.1.28)
     // or, you may not running komorebi
