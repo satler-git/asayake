@@ -4,10 +4,9 @@
 mod icon;
 mod img;
 
-use core::panic;
-
 use anyhow::{Context as _, Result};
-use komorebi_client::{send_query, Layout, SocketMessage, State};
+use itertools::Itertools;
+use komorebi_client::{send_query, SocketMessage, State};
 use komorebi_client::{Monitor, Window, Workspace};
 use tauri::Manager as _;
 use tauri::SystemTray;
@@ -160,6 +159,7 @@ impl From<&Monitor> for AsayakeMonitorState {
             monitor_id: value.id(),
             focusing_workspace: focusing_workspace,
             workspaces: workspaces_for_send,
+            size: value.size().into()
         }
     }
 }
@@ -176,30 +176,16 @@ impl From<&Workspace> for WorkspaceForSend {
 
         WorkspaceForSend {
             items: container_for_send,
-            layout: value.layout().into(),
+            layout: value.latest_layout().iter().map(|x| x.into()).collect_vec(),
         }
     }
 }
 
-impl From<&Layout> for LayoutForSend {
-    fn from(value: &Layout) -> Self {
-        if let Layout::Default(default_layout_kind) = value {
-            LayoutForSend::Default(match default_layout_kind {
-                komorebi_client::DefaultLayout::BSP => DefaultLayout::BSP,
-                komorebi_client::DefaultLayout::Columns => DefaultLayout::Columns,
-                komorebi_client::DefaultLayout::Rows => DefaultLayout::Rows,
-                komorebi_client::DefaultLayout::VerticalStack => DefaultLayout::VerticalStack,
-                komorebi_client::DefaultLayout::HorizontalStack => DefaultLayout::HorizontalStack,
-                komorebi_client::DefaultLayout::UltrawideVerticalStack => {
-                    DefaultLayout::UltrawideVerticalStack
-                }
-                komorebi_client::DefaultLayout::Grid => DefaultLayout::Grid,
-                komorebi_client::DefaultLayout::RightMainVerticalStack => {
-                    DefaultLayout::RightMainVerticalStack
-                }
-            })
-        } else {
-            panic!("Unable to parse custom layout, asayake still doesn't have compatibility for custom layout");
+impl From<&komorebi_client::Rect> for Rect {
+    fn from(value: &komorebi_client::Rect) -> Self {
+        Rect {
+            left_top: (value.left as u16, value.top as u16),
+            right_bottom: (value.right as u16, value.bottom as u16),
         }
     }
 }

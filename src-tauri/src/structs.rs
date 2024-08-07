@@ -5,12 +5,13 @@ pub struct AsayakeMonitorState {
     pub monitor_id: isize,
     pub focusing_workspace: usize,
     pub workspaces: Vec<WorkspaceForSend>,
+    pub size: Rect,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
 pub struct WorkspaceForSend {
     pub items: Vec<ContainerForSend>,
-    pub layout: LayoutForSend
+    pub layout: Vec<Rect>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
@@ -30,22 +31,11 @@ pub struct Icon {
     pub base64_icon: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
-pub enum LayoutForSend {
-    Default(DefaultLayout),
-    // Custom(CustomLayout),
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
-pub enum DefaultLayout {
-    BSP,
-    Columns,
-    Rows,
-    VerticalStack,
-    HorizontalStack,
-    UltrawideVerticalStack,
-    Grid,
-    RightMainVerticalStack,
+/// TODO: komorebi_clientの実装を見るとマイナスの可能性もあるかも
+#[derive(PartialEq, Eq, Debug, Clone, serde::Deserialize, serde::Serialize, Hash)]
+pub struct Rect {
+    left_top: (u16, u16),
+    right_bottom: (u16, u16),
 }
 
 // Maybe-later: CustomLayoutは実装が難しそう

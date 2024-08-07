@@ -1,5 +1,3 @@
-mod calc_layout;
-
 use anyhow::{Context as _, Result};
 
 use serde::{Deserialize, Serialize};
