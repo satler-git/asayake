@@ -18,8 +18,7 @@
 }
 
 .flex {
-  width: 550px;
-  /* 幅を調整 maybe-TODO: 数に応じて自動調整 */
+  width: fit-content;
   height: 90px;
   /* 高さを調整 */
   background-color: var(--color-primary);
