@@ -151,8 +151,14 @@ impl From<&Monitor> for AsayakeMonitorState {
 
         let mut workspaces_for_send: Vec<WorkspaceForSend> = vec![];
 
+        let mut index = 0;
         for woi in workspaces {
-            workspaces_for_send.push(woi.into());
+            let mut workspace: WorkspaceForSend = woi.into();
+            if index == focusing_workspace {
+                workspace.focusing = true;
+            }
+            workspaces_for_send.push(workspace);
+            index += 1;
         }
 
         AsayakeMonitorState {
@@ -177,6 +183,7 @@ impl From<&Workspace> for WorkspaceForSend {
         WorkspaceForSend {
             items: container_for_send,
             layout: value.latest_layout().iter().map(|x| x.into()).collect_vec(),
+            focusing: false
         }
     }
 }

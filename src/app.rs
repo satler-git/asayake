@@ -57,12 +57,12 @@ pub fn App() -> Html {
             .workspaces
             .iter()
             .filter(|x| x.items != vec![])
-            .map(|x| html! { <Workspace items={x.items.clone()} layout={x.layout.clone()} />})
+            .map(|x| html! { <Workspace items={x.items.clone()} layout={x.layout.clone()} focusing={x.focusing.clone()} />})
             .collect::<Vec<Html>>()
     });
 
     html! {
-        <div class="container">
+        <div class="flex">
             {<Vec<VNode> as Clone>::clone(&*workspaces.clone())}
         </div>
     }
@@ -72,11 +72,17 @@ pub fn App() -> Html {
 fn Workspace(workspace: &WorkspaceForSend) -> Html {
     html! {
         <div class="workspace">
+            if workspace.focusing {
+                <div class="selector"/>
+            }
         </div>
     }
 }
 
 #[function_component]
 fn Container(container: &ContainerForSend) -> Html {
-    todo!()
+    html! {
+        <div class="container">
+        </div>
+    }
 }

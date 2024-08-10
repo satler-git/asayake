@@ -12,6 +12,7 @@ pub struct AsayakeMonitorState {
 pub struct WorkspaceForSend {
     pub items: Vec<ContainerForSend>,
     pub layout: Vec<Rect>,
+    pub focusing: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
