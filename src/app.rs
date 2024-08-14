@@ -44,7 +44,8 @@ pub fn App() -> Html {
                     if let Ok(res) = from_value::<Event>(s) {
                         if let Ok(payload) = res.payload {
                             asayake_state.set(payload);
-                        } else if let Err(err) = res.payload { // エラーの場合は飛んできたエラーをセットする。
+                        } else if let Err(err) = res.payload {
+                            // エラーの場合は飛んできたエラーをセットする。
                             asayake_state.set(AsayakeMonitorState::default());
                             asayake_error_state.set(Some(err));
                         }
@@ -66,12 +67,11 @@ pub fn App() -> Html {
     });
 
     let err = use_memo(asayake_error_state, |asayake_error_state| {
-        let str = match asayake_error_state.as_ref() {
-            Some(err) => format!("{err}"),
-            None => "".into(),
-        };
-        html! {
-            <div class="error">{str}</div>
+        match asayake_error_state.as_ref() {
+            Some(err) => html! {
+                <div class="error">{format!("{err}")}</div>
+            },
+            None => html!{},
         }
     });
 
