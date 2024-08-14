@@ -69,7 +69,7 @@ async fn main() -> Result<()> {
                         if state {
                             // Windowを表示して描画。イベントを送る。
                             app_handle
-                                    .emit_all("re-rendering", fetch_asayake_window_state(0))
+                                    .emit_all("re-rendering", &fetch_asayake_window_state(0))
                                     .unwrap();
                             main_window_alt.show().unwrap();
                         } else {
@@ -97,7 +97,7 @@ async fn main() -> Result<()> {
                             if main_window_notify.is_visible().unwrap() {
                                 // フロントエンド側に再レンダリングを要求
                                 app_handle_notify
-                                    .emit_all("re-rendering", fetch_asayake_window_state(0))
+                                    .emit_all("re-rendering", &fetch_asayake_window_state(0))
                                     .unwrap();
                             }
                         }
@@ -223,12 +223,16 @@ impl From<&Window> for WindowForSend {
 /// * `window_num` zero-based indeex
 // TODO: Fromトレイトを実装して`From<&Monitor> for AsayakeMonitorState`を使って変換するようにする
 #[tauri::command]
-fn fetch_asayake_window_state(window_num: u64) -> AsayakeMonitorState {
+fn fetch_asayake_window_state(window_num: u64) -> Result<AsayakeMonitorState, AsayakeError> {
     // komorebiの状態から自分のモニターを抜き出す
-    let komorebi_state = fetch_komorebi_state().unwrap();
-    let monitor = komorebi_state.monitors.elements().get(window_num as usize).unwrap();
+    if let Ok(komorebi_state) = fetch_komorebi_state() {
+        let monitor = komorebi_state.monitors.elements().get(window_num as usize).unwrap();
 
-    monitor.into()
+        Ok(monitor.into())
+    } else {
+        Err(AsayakeError::DisconnectFromKomorebi)
+    }
+
 }
 
 #[cfg(test)]

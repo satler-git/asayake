@@ -1,3 +1,5 @@
+use thiserror::Error;
+
 #[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Hash)]
 pub struct AsayakeMonitorState {
     pub monitor_id: isize,
@@ -38,6 +40,12 @@ pub struct Icon {
 pub struct Rect {
     left_top: (u16, u16),
     right_bottom: (u16, u16),
+}
+
+#[derive(Error, Debug, Deserialize, PartialEq, Eq)]
+pub enum AsayakeError {
+    #[error("Asayake is disconnected from komorebi.\n Is komorebi running?")]
+    DisconnectFromKomorebi,
 }
 
 impl Default for AsayakeMonitorState {

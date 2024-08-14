@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
 pub struct AsayakeMonitorState {
@@ -37,6 +38,12 @@ pub struct Icon {
 pub struct Rect {
     left_top: (u16, u16),
     right_bottom: (u16, u16),
+}
+
+#[derive(Error, Debug, Serialize)]
+pub enum AsayakeError {
+    #[error("Asayake is disconnected from komorebi.\n Is komorebi running?")]
+    DisconnectFromKomorebi,
 }
 
 // Maybe-later: CustomLayoutは実装が難しそう
