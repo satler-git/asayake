@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "command": "trunk",
+      "args": ["serve"],
+      "group": "none",
+      "isBackground": true,
+      "problemMatcher": ["$rustc", "$rust-panic"],
+      "label": "trunk: serve"
+    },
+    {
+      "type": "shell",
+      "command": "trunk",
+      "args": ["build", "--release"],
+      "group": "none",
+      "label": "trunk: build"
+    }
+  ]
+}

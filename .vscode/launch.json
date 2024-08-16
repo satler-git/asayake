@@ -16,7 +16,7 @@
         ]
       },
       // task for the `beforeDevCommand` if used, must be configured in `.vscode/tasks.json`
-      "preLaunchTask": "ui:dev"
+      "preLaunchTask": "trunk: serve"
     },
     {
       "type": "lldb",
@@ -26,7 +26,7 @@
         "args": ["build", "--release", "--manifest-path=./src-tauri/Cargo.toml"]
       },
       // task for the `beforeBuildCommand` if used, must be configured in `.vscode/tasks.json`
-      "preLaunchTask": "ui:build"
+      "preLaunchTask": "trunk: build"
     }
   ]
 }
