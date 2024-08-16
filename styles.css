@@ -100,13 +100,19 @@
   display: grid;
   row-gap: 2px;
   column-gap: 3px;
+  align-items: center;
+  justify-items: stretch;
+  justify-content: center;
+  align-content: center;
 }
 
 .container {
-  background-color: var(--color-secondary);
+  background-color: var(--color-primary);
+  border-radius: 4px;
   /* border-color: #000; TODO: */
   border-style: solid;
-  border-width: 1.5px;
+  border-width: 2px;
+  box-sizing: border-box;
   /* padding for icons */
   padding-top: 16.62px;
   padding-bottom: 16.62px;
