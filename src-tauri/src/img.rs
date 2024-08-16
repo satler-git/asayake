@@ -16,21 +16,21 @@ pub fn convert_img_base64(image_from: &DynamicImage) -> String {
     format!("data:image/png;base64,{}", resp_base64)
 }
 
-fn cast_rgbau8_to_usize(rgba: &Rgba<u8>) -> usize {
+fn cast_rgbau8_to_string(rgba: &Rgba<u8>) -> String {
     let rgb = rgba.to_rgb();
-    ((rgb[0] as usize) << 16) | ((rgb[1] as usize) << 8) | (rgb[2] as usize)
+    format!("{:02X}{:02X}{:02X}", rgb.0[0], rgb.0[1],rgb.0[2])
 }
 
 /// 一番多く使われている色を`u32`で返す
 /// 計算量が多い(アイコンはそこまでサイズがデカくないから大丈夫かも)
-pub fn find_most_used_color(image: &DynamicImage) -> Result<u32> {
+pub fn find_most_used_color(image: &DynamicImage) -> Result<String> {
     if let DynamicImage::ImageRgba8(img) = image {
         // 各ピクセルをイテレートして色情報を取得
         let pixels = img.pixels();
-        let mut counts: FxHashMap<usize, u32> = FxHashMap::default();
+        let mut counts: FxHashMap<String, u32> = FxHashMap::default();
 
         for pi in pixels {
-            let count = counts.entry(cast_rgbau8_to_usize(pi)).or_insert(0);
+            let count = counts.entry(cast_rgbau8_to_string(pi)).or_insert(0);
             *count += 1;
         }
 
@@ -39,7 +39,7 @@ pub fn find_most_used_color(image: &DynamicImage) -> Result<u32> {
             .max_by_key(|i| i.1)
             .context("Unable to find the most common color")?;
 
-        Ok(*most_common_color.0 as u32)
+        Ok(most_common_color.0.clone())
     } else {
         bail!("Unable to cast down to a Rgba image.")
     }
@@ -60,9 +60,16 @@ mod tests {
         Ok(image.to_rgba8().into())
     }
 
+    #[test]
+    fn test_cast_rgbau8_to_string() {
+        assert_eq!("FFFFFF", cast_rgbau8_to_string(&Rgba([0xFF, 0xFF, 0xFF, 0xFF])));
+        assert_eq!("000000", cast_rgbau8_to_string(&Rgba([0x0, 0x0, 0x0, 0xFF])));
+        assert_eq!("010203", cast_rgbau8_to_string(&Rgba([0x1, 0x2, 0x3, 0xFF])));
+    }
+
     fn check_one_colored_image(rgb: Rgb<u8>) -> Result<()> {
         let image = &make_one_colored_image(&rgb)?;
-        let rgb_u32 = ((rgb[0] as u32) << 16) | ((rgb[1] as u32) << 8) | (rgb[2] as u32);
+        let rgb_u32 = cast_rgbau8_to_string(&Rgba([rgb.0[0], rgb.0[1], rgb.0[2], 0xFF]));
         assert_eq!(find_most_used_color(image)?, rgb_u32);
         Ok(())
     }

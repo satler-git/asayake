@@ -28,7 +28,7 @@ pub struct ContainerForSend {
 pub struct WindowForSend {
     pub id: u16,
     pub icon: Icon,
-    pub accent_color: u32,
+    pub accent_color: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Hash)]
@@ -38,8 +38,8 @@ pub struct Icon {
 
 #[derive(PartialEq, Eq, Debug, Clone, Deserialize, Serialize, Hash)]
 pub struct Rect {
-    left_top: (u16, u16),
-    right_bottom: (u16, u16),
+    pub left_top: (u16, u16),
+    pub right_bottom: (u16, u16),
 }
 
 #[derive(Error, Debug, Deserialize, PartialEq, Eq)]
@@ -75,7 +75,7 @@ impl Default for WindowForSend {
         WindowForSend {
             id: 0,
             icon: Icon::default(),
-            accent_color: 0xFFFFFF,
+            accent_color: "FFFFFF".into(),
         }
     }
 }

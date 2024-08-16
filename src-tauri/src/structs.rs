@@ -25,7 +25,7 @@ pub struct ContainerForSend {
 pub struct WindowForSend {
     pub id: u16,
     pub icon: Icon,
-    pub accent_color: u32
+    pub accent_color: String
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
