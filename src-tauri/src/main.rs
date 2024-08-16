@@ -247,7 +247,7 @@ mod tests {
     #[ignore]
     fn test_fetch_asayake_window_state_run() -> Result<()> {
         let mut output = File::create("example_asayake_state.dpp")?;
-        write!(output, "{:?}", fetch_asayake_window_state(0))?;
+        write!(output, "{:#?}", fetch_asayake_window_state(0))?;
         Ok(())
     }
 
