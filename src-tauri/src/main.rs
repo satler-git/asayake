@@ -80,16 +80,16 @@ async fn main() -> Result<()> {
                 }
             });
 
-            let main_window_notify = app.get_window("main").unwrap();
-            let app_handle_notify = app.app_handle();
+            // let main_window_notify = app.get_window("main").unwrap();
+            // let app_handle_notify = app.app_handle();
 
-            tokio::task::spawn(async move {
-                // komorebiの通知の監視
-                // TODO: 関数へ切り出し
-                // メモ: asyncブロックはfutureを返す。だからmoveしている変数だけ引数にしてasync関数をつくればいい
-                let notify_receiver = komorebi_client::subscribe("asayake")
-                    .context("Unable to subscribe notifyes from komorebi now.")
-                    .unwrap();
+            // tokio::task::spawn(async move {
+            //     // komorebiの通知の監視
+            //     // TODO: 関数へ切り出し
+            //     // メモ: asyncブロックはfutureを返す。だからmoveしている変数だけ引数にしてasync関数をつくればいい
+            //     let notify_receiver = komorebi_client::subscribe("asayake")
+            //         .context("Unable to subscribe notifyes from komorebi now.")
+            //         .unwrap();
 
                 for incoming in notify_receiver.incoming() {
                     match incoming {
@@ -183,7 +183,7 @@ impl From<&Workspace> for WorkspaceForSend {
         WorkspaceForSend {
             items: container_for_send,
             layout: value.latest_layout().iter().map(|x| x.into()).collect_vec(),
-            focusing: false
+            focusing: false // あとからtrueにする
         }
     }
 }
