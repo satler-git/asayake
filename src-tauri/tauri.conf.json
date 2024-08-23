@@ -25,7 +25,6 @@
         "closable": false,
         "focus": false,
         "alwaysOnTop": true,
-        "contentProtected": true,
         "skipTaskbar": true,
         "transparent": true,
         "decorations": false,

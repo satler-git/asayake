@@ -91,22 +91,22 @@ async fn main() -> Result<()> {
             //         .context("Unable to subscribe notifyes from komorebi now.")
             //         .unwrap();
 
-                for incoming in notify_receiver.incoming() {
-                    match incoming {
-                        Ok(_) => {
-                            if main_window_notify.is_visible().unwrap() {
-                                // フロントエンド側に再レンダリングを要求
-                                app_handle_notify
-                                    .emit_all("re-rendering", &fetch_asayake_window_state(0))
-                                    .unwrap();
-                            }
-                        }
-                        Err(_) => {
-                            continue;
-                        }
-                    }
-                }
-            });
+            //     for incoming in notify_receiver.incoming() {
+            //         match incoming {
+            //             Ok(_) => {
+            //                 if main_window_notify.is_visible().unwrap() {
+            //                     // フロントエンド側に再レンダリングを要求
+            //                     app_handle_notify
+            //                         .emit_all("re-rendering", &fetch_asayake_window_state(0))
+            //                         .unwrap();
+            //                 }
+            //             }
+            //             Err(_) => {
+            //                 continue;
+            //             }
+            //         }
+            //     }
+            // });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![fetch_asayake_window_state])
@@ -192,7 +192,7 @@ impl From<&komorebi_client::Rect> for Rect {
     fn from(value: &komorebi_client::Rect) -> Self {
         Rect {
             left_top: (value.left as u16, value.top as u16),
-            right_bottom: (value.right as u16, value.bottom as u16),
+            right_bottom: ((value.right + value.left) as u16, (value.top + value.bottom) as u16),
         }
     }
 }
