@@ -1,3 +1,8 @@
+> [!WARNING]
+> This project has been archived.
+> Because I left Windows.
+> NixOS is good.
+
 # asayake
 
 Yet another status bar for komorebi.
